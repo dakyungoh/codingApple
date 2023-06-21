@@ -22,7 +22,9 @@ function App() {
       <div className="main-bg"></div>
       <div className="container">
         <div className="row">
-          <Card shoes={shoes} />
+          {shoes.map((shoe, i) => {
+            return <Card shoes={shoes[i]} i={i + 1} key={i} />;
+          })}
         </div>
       </div>
     </div>
@@ -30,10 +32,18 @@ function App() {
 }
 
 function Card(props) {
-  <div className="col-md-4">
-    <img src="https://codingapple1.github.io/shop/shoes1.jpg" width="80%" />
-    <h4>{props.shoes[0].title}</h4>
-    <p>{props.shoes[0].content}</p>
-  </div>;
+  const { shoes } = props;
+  return (
+    <div className="col-md-4">
+      <img
+        src={
+          "https://codingapple1.github.io/shop/shoes" + (props.i + 1) + ".jpg"
+        }
+        width="80%"
+      />
+      <h4>{shoes.title}</h4>
+      <p>{shoes.price}</p>
+    </div>
+  );
 }
 export default App;
