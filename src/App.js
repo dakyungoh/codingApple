@@ -2,13 +2,51 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Navbar, Container, Nav } from "react-bootstrap";
 import data from "./data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Link, useNavigate, Outlet } from "react-router-dom";
 import Detail from "./routes/Detail";
+import axios from "axios";
 
 function App() {
   const [shoes, setShoes] = useState(data);
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (count === 1) {
+      setLoading(true);
+      setTimeout(() => {
+        axios
+          .get("https://codingapple1.github.io/shop/data2.json")
+          .then((response) => {
+            setShoes((shoe) => [...shoe, ...response.data]);
+          })
+          .catch((err) => {
+            console.log("실패");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }, 3000);
+    } else if (count === 2) {
+      setLoading(true);
+      axios
+        .get("https://codingapple1.github.io/shop/data3.json")
+        .then((response) => {
+          setShoes((shoe) => [...shoe, ...response.data]);
+        })
+        .catch((err) => {
+          console.log("실패");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else if (count > 3) {
+      alert("더이상 상품이 없습니다.");
+    }
+  }, [count]);
+
   return (
     <div className="App">
       <Container>
@@ -29,11 +67,22 @@ function App() {
                     return <Card shoes={shoes[i]} i={i} key={i}></Card>;
                   })}
                 </div>
+                <div className="loading-text">
+                  {loading && <p>로딩중입니다.</p>}
+                </div>
+                <button
+                  onClick={() => {
+                    setCount((count) => count + 1);
+                  }}
+                  disabled={loading}
+                >
+                  더보기
+                </button>
               </div>
             </>
           }
         />
-        <Route path="/detail" element={<Detail />}></Route>
+        <Route path="/detail/:id" element={<Detail shoes={shoes} />}></Route>
         <Route path="*" element={<div>없는 페이지요</div>}></Route>
         <Route
           path="/event"
@@ -60,10 +109,12 @@ function Card(props) {
           "https://codingapple1.github.io/shop/shoes" + (props.i + 1) + ".jpg"
         }
         width="80%"
+        alt=""
       />
       <h4>{shoes.title}</h4>
       <p>{shoes.price}</p>
     </div>
   );
 }
+
 export default App;
